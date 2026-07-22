@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Warung Bu Niwen | Urban Harvest</title>
+    <title>Katalog Produk - Warung Bu Niwen</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #ff6b35; --dark: #1a1a1a; --soft: #f4f1ea; }
@@ -14,123 +14,557 @@
         .header-title { position: absolute; color: white; text-align: center; }
         .header-title h1 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 3rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
         
+        /* Tombol Ganti Logo Warung di Mode Admin */
+        .admin-logo-btn { display: none; position: absolute; bottom: 15px; right: 15px; z-index: 50; background: rgba(0,0,0,0.7); color: white; border: 1px solid white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-weight: 700; }
+        
         .search-container { padding: 20px 5% 0 5%; }
         #searchBar { width: 100%; padding: 12px; border-radius: 50px; border: 2px solid var(--dark); box-sizing: border-box; font-size: 1rem; }
         
-        .cart-nav { position: fixed; top: 20px; right: 5%; z-index: 100; }
-        .cart-btn { background: var(--dark); color: white; padding: 10px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; border: 2px solid white; }
+        /* Sidebar & Hamburger Menu Styles */
+        .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 101; background: var(--dark); color: white; border: 2px solid white; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; }
+        .sidebar { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: white; z-index: 200; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: right 0.3s ease; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .sidebar.open { right: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        .sidebar-header h3 { margin: 0; font-size: 1.2rem; }
+        .close-sidebar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--dark); width: auto; margin: 0; padding: 0; }
+        .sidebar-menu-btn { background: var(--dark); color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; margin-bottom: 12px; text-align: left; width: 100%; }
+        .sidebar-menu-btn.admin { background: var(--accent); }
+
+        /* Navigation Tabs Container */
+        .page-tabs { display: flex; justify-content: center; gap: 10px; padding: 15px 5%; background: rgba(0,0,0,0.03); border-bottom: 1px solid #ddd; flex-wrap: wrap; }
+        .tab-btn { background: #ddd; color: var(--dark); border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 700; width: auto; margin-top: 0; transition: background 0.3s, color 0.3s; }
+        .tab-btn.active { background: var(--accent); color: white; }
+
+        /* Store Description & Operational Hours Banner */
+        .store-desc-toggle-btn { background: #eee; color: var(--dark); border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin: 15px 5% 0 5%; width: auto; display: block; text-align: center; }
+        .store-desc-banner { display: none; background: white; margin: 10px 5% 0 5%; padding: 15px 20px; border-radius: 15px; border: 1px solid #ddd; font-size: 0.9rem; line-height: 1.5; color: #555; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .store-info-flex { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; flex-wrap: wrap; }
+        .store-desc-text { flex: 2; min-width: 200px; }
+        .store-hours-text { flex: 1; min-width: 140px; background: #fdfbf7; padding: 10px; border-radius: 10px; border: 1px dashed var(--accent); font-size: 0.85rem; }
+        .edit-desc-btn { display: none; margin-top: 10px; background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: 700; width: auto; }
+
+        /* Catalog Pages with Transitions */
+        .catalog-page { display: none; opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; transform: translateY(15px); }
+        .catalog-page.active-page { display: block; opacity: 1; transform: translateY(0); }
+
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 5% 30px 5%; }
+        .product-card { background: white; padding: 10px; border-radius: 20px; border: 2px solid var(--dark); text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .product-card img { width: 100%; height: 110px; object-fit: cover; border-radius: 12px; margin-bottom: 5px; cursor: pointer; border: 1px solid #ddd; transition: transform 0.3s ease, filter 0.3s ease; }
+        .product-card img:hover { transform: scale(1.03); filter: brightness(90%); }
         
-        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 5% 50px 5%; }
-        .product-card { background: white; padding: 10px; border-radius: 20px; border: 2px solid var(--dark); text-align: center; }
-        .product-card .img-placeholder { width: 100%; height: 100px; background: #eee; border-radius: 15px; margin-bottom: 5px; cursor: pointer; }
+        .price-container { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 0 8px 0; }
+        .edit-price-icon, .delete-catalog-icon { background: none; border: none; cursor: pointer; color: #666; font-size: 0.85rem; padding: 0; width: auto; margin: 0; }
+        .edit-price-icon:hover { color: var(--accent); }
+        .delete-catalog-icon:hover { color: #d9534f; }
+
+        #modal, #desc-modal, #admin-modal, #admin-form-modal, #edit-price-modal, #edit-desc-modal, #edit-logo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 250; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; text-align: center; box-sizing: border-box; animation: modalPop 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
         
-        #modal, #desc-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; text-align: center; }
-        
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-image { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; border: 1px solid #ddd; }
+
         button { background: var(--dark); color: white; border: none; padding: 8px 12px; border-radius: 50px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 5px; }
         .btn-beli { background: var(--accent); }
+        
+        .form-group { margin-bottom: 12px; text-align: left; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px 12px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 0.9rem; }
+
+        /* Floating Notification for Cart Addition */
+        .cart-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--dark); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 500; z-index: 300; box-shadow: 0 4px 15px rgba(0,0,0,0.3); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none; }
+        .cart-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Footer Store Address */
+        footer.store-footer { background: var(--dark); color: white; text-align: center; padding: 25px 20px; margin-top: 40px; font-size: 0.9rem; line-height: 1.6; border-top: 4px solid var(--accent); }
+        footer.store-footer h4 { margin: 0 0 8px 0; font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--accent); }
+        footer.store-footer p { margin: 0; opacity: 0.9; }
     </style>
 </head>
 <body>
 
-    <div class="cart-nav">
-        <div class="cart-btn" onclick="openCart()">Keranjang (<span id="count">0</span>)</div>
+    <!-- Hamburger Button for Sidebar -->
+    <div class="hamburger-btn" onclick="toggleSidebar()">☰</div>
+
+    <!-- Sidebar & Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3 id="sidebarTitle">Menu Utama</h3>
+            <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
+        </div>
+        <div id="sidebarMenuContent">
+            <button class="sidebar-menu-btn" onclick="openCart(); toggleSidebar();">🛒 Keranjang (<span id="count">0</span>)</button>
+            <button class="sidebar-menu-btn admin" onclick="openAdminLogin(); toggleSidebar();">🔑 Admin (Mode Admin)</button>
+        </div>
     </div>
 
     <header>
-        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800" class="hero-bg">
-        <div class="header-title"><h1>Warung Bu Niwen</h1></div>
+        <img src="images/Logo1.png" class="hero-bg" id="heroLogoImg" alt="Hero Background">
+        <div class="header-title"><h1 id="headerMainTitle"></h1></div>
+        <button class="admin-logo-btn" id="adminLogoBtn" onclick="openEditLogoModal()">🖼️ Ganti Logo</button>
     </header>
 
-    <div class="search-container">
-        <input type="text" id="searchBar" placeholder="Cari sayuran..." onkeyup="filterProducts()">
+    <div class="search-container" id="searchContainerDiv">
+        <input type="text" id="searchBar" placeholder="Cari produk..." onkeyup="filterProducts()">
     </div>
 
-    <div class="product-grid" id="grid"></div>
+    <!-- Store Description Section (Toggleable) -->
+    <button class="store-desc-toggle-btn" id="storeDescToggleBtn" onclick="toggleStoreDesc()">ℹ️ Deskripsi Toko</button>
+    <div class="store-desc-banner" id="storeDescBanner">
+        <div class="store-info-flex">
+            <div class="store-desc-text">
+                <span id="storeDescContent"><strong>Warung Bu Niwen</strong> menyediakan berbagai macam kebutuhan harian, sayuran segar pilihan berkualitas, serta aneka kebutuhan rumah tangga lengkap dengan harga terjangkau dan pelayanan ramah langsung dari hati.</span>
+                <br>
+                <button class="edit-desc-btn" id="editDescBtn" onclick="openEditDescModal()">✏️ Edit Deskripsi & Jam</button>
+            </div>
+            <div class="store-hours-text">
+                <strong>🕒 Jam Operasional:</strong><br>
+                <span id="storeHoursContent">Setiap Hari<br>06.00 - 21.00 WIB</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-tabs" id="pageTabsContainer">
+        <!-- Tab halaman akan dirender secara dinamis agar mendukung penambahan kategori baru -->
+    </div>
+
+    <!-- Container halaman katalog dinamis -->
+    <div id="catalogPagesContainer"></div>
+
+    <!-- Floating Notification Toast -->
+    <div class="cart-toast" id="cartToast">Barang berhasil ditambahkan ke keranjang!</div>
+
+    <!-- Store Address Footer -->
+    <footer class="store-footer">
+        <h4>Warung Bu Niwen</h4>
+        <p>Jalan raya wlahar rt 001 / rw 007</p>
+    </footer>
 
     <!-- Modals -->
     <div id="modal">
         <div class="modal-content">
             <h3>Daftar Pesanan</h3>
-            <ul id="cart-list" style="list-style: none; padding: 0; text-align: left;"></ul>
+            <ul id="cart-list" style="list-style: none; padding: 0; text-align: left; max-height: 150px; overflow-y: auto;"></ul>
             <p><strong>Total: Rp <span id="total">0</span></strong></p>
             <button onclick="checkout()">Checkout ke WhatsApp</button>
-            <button style="background:#ccc" onclick="closeModal('modal')">Tutup</button>
+            <button style="background:#ccc; color:#333;" onclick="closeModal('modal')">Tutup</button>
         </div>
     </div>
 
+    <!-- Enhanced Description & Image Modal with Transition Effect -->
     <div id="desc-modal">
         <div class="modal-content">
-            <h3 id="desc-title"></h3>
-            <p id="desc-text"></p>
+            <img id="desc-img" src="" alt="Detail Gambar" class="modal-image" onerror="this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400'">
+            <h3 id="desc-title" style="margin-top:0;"></h3>
+            <p id="desc-text" style="color: #555; font-size: 0.95rem; line-height: 1.5;"></p>
             <button onclick="closeModal('desc-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-modal">
+        <div class="modal-content">
+            <h3>Login Admin</h3>
+            <div class="form-group">
+                <label>Username Admin:</label>
+                <input type="text" id="adminUsername" placeholder="Username admin...">
+            </div>
+            <div class="form-group">
+                <label>Sandi Admin:</label>
+                <input type="password" id="adminPassword" placeholder="Sandi admin...">
+            </div>
+            <button onclick="verifyAdmin()">Masuk</button>
+            <button style="background:#ccc; color:#333;" onclick="closeModal('admin-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Admin Form Modal to Add Product -->
+    <div id="admin-form-modal">
+        <div class="modal-content">
+            <h3>Tambah Barang Baru</h3>
+            <div class="form-group">
+                <label>Pilih Katalog:</label>
+                <select id="adminCatalog"></select>
+            </div>
+            <div class="form-group">
+                <label>Gambar Produk:</label>
+                <input type="file" id="adminImageFile" accept="image/*" onchange="handleImageUpload(event)" style="margin-bottom: 6px;">
+                <input type="text" id="adminImage" placeholder="Atau ketik URL / path gambar...">
+            </div>
+            <div class="form-group">
+                <label>Nama:</label>
+                <input type="text" id="adminName" placeholder="Nama barang...">
+            </div>
+            <div class="form-group">
+                <label>Harga (Rp):</label>
+                <input type="number" id="adminPrice" placeholder="Contoh: 10000">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi:</label>
+                <textarea id="adminDesc" rows="3" placeholder="Deskripsi barang..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Stok:</label>
+                <input type="number" id="adminStock" value="10">
+            </div>
+            <button class="btn-beli" onclick="addProduct()">Simpan Barang</button>
+            <button style="background:#ccc; color:#333;" onclick="closeModal('admin-form-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Edit Catalog Form Modal (Tanpa Konfirmasi Sandi) -->
+    <div id="edit-price-modal">
+        <div class="modal-content">
+            <h3 id="edit-price-title">Edit Katalog Produk</h3>
+            <div id="edit-form-section">
+                <div class="form-group">
+                    <label>Gambar Produk:</label>
+                    <input type="file" id="editImageFile" accept="image/*" onchange="handleEditImageUpload(event)" style="margin-bottom: 6px;">
+                    <input type="text" id="editProductImage" placeholder="URL / path gambar...">
+                </div>
+                <div class="form-group">
+                    <label>Nama Produk:</label>
+                    <input type="text" id="editProductName" placeholder="Nama produk...">
+                </div>
+                <div class="form-group">
+                    <label>Harga Baru (Rp):</label>
+                    <input type="number" id="editProductPrice" placeholder="Harga baru...">
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi:</label>
+                    <textarea id="editProductDesc" rows="3" placeholder="Deskripsi produk..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Stok:</label>
+                    <input type="number" id="editProductStock" placeholder="Stok produk...">
+                </div>
+                <button class="btn-beli" onclick="saveEditedCatalog()">Simpan Perubahan Katalog</button>
+            </div>
+            <button style="background:#ccc; color:#333; margin-top:10px;" onclick="closeModal('edit-price-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Edit Store Description & Hours Modal -->
+    <div id="edit-desc-modal">
+        <div class="modal-content">
+            <h3>Edit Deskripsi & Jam Toko</h3>
+            <div class="form-group">
+                <label>Deskripsi Toko:</label>
+                <textarea id="inputStoreDesc" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Jam Operasional:</label>
+                <textarea id="inputStoreHours" rows="2"></textarea>
+            </div>
+            <button class="btn-beli" onclick="saveStoreDesc()">Simpan Perubahan</button>
+            <button style="background:#ccc; color:#333; margin-top:10px;" onclick="closeModal('edit-desc-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Edit Logo Modal -->
+    <div id="edit-logo-modal">
+        <div class="modal-content">
+            <h3>Ganti Logo Warung</h3>
+            <div class="form-group">
+                <label>Pilih File Logo Baru:</label>
+                <input type="file" id="logoImageFile" accept="image/*" onchange="handleLogoUpload(event)" style="margin-bottom: 6px;">
+                <input type="text" id="inputLogoUrl" placeholder="Atau ketik URL / path gambar...">
+            </div>
+            <button class="btn-beli" onclick="saveLogo()">Simpan Logo</button>
+            <button style="background:#ccc; color:#333; margin-top:10px;" onclick="closeModal('edit-logo-modal')">Tutup</button>
         </div>
     </div>
 
     <script>
         const WA_NUMBER = "6285695020949"; 
-        const products = [
-            {name: "Organic Kale", price: 12000, desc: "Kale organik segar kaya nutrisi."},
-            {name: "Cherry Tomato", price: 15000, desc: "Tomat cherry manis dan segar."},
-            {name: "Baby Spinach", price: 9000, desc: "Bayam muda yang lembut untuk salad."},
-            {name: "Carrot Fresh", price: 8000, desc: "Wortel manis renyah kualitas terbaik."},
-            {name: "Broccoli", price: 18000, desc: "Brokoli hijau kaya serat dan antioksidan."},
-            {name: "Cucumber", price: 6000, desc: "Timun segar, cocok untuk lalapan."},
-            {name: "Lettuce", price: 7000, desc: "Selada hidroponik yang sangat renyah."},
-            {name: "Bell Pepper", price: 20000, desc: "Paprika warna-warni kaya vitamin C."},
-            {name: "Eggplant", price: 10000, desc: "Terong ungu segar untuk masakan rumah."},
-            {name: "Cauliflower", price: 16000, desc: "Bunga kol putih bersih dan padat."},
-            {name: "Potato", price: 12000, desc: "Kentang pilihan berkualitas tinggi."},
-            {name: "Pumpkin", price: 15000, desc: "Labu kuning manis dan pulen."},
-            {name: "Green Beans", price: 8500, desc: "Buncis segar pilihan petani lokal."},
-            {name: "Spring Onion", price: 5000, desc: "Daun bawang segar untuk pelengkap masakan."},
-            {name: "Garlic", price: 12000, desc: "Bawang putih kualitas tinggi, aroma kuat."},
-            {name: "Chili Pepper", price: 25000, desc: "Cabai rawit pedas segar."},
-            {name: "Sweet Corn", price: 9000, desc: "Jagung manis, siap dimasak."},
-            {name: "Mushrooms", price: 14000, desc: "Jamur tiram segar, tekstur kenyal."},
-            {name: "Celery", price: 6000, desc: "Seledri organik aroma segar."},
-            {name: "Radish", price: 7500, desc: "Lobak segar, renyah dan sehat."}
-        ];
+        let isAdminMode = false;
+        let loginAttempts = 0;
         
-        let cart = [];
-        const grid = document.getElementById('grid');
+        let categories = ["Sayuran", "Kebutuhan", "Lainnya"];
+        
+        let catalogsData = [
+            [
+                {name: "Paket Sop Bening", price: 5000, desc: "Kol (Kubis) segar , Wortel , Buncis , Daun bawang , Bawang putih , Bawang merah", image: "images/paket sop bening.jpg", stock: 10},
+                {name: "Cherry Tomato", price: 15000, desc: "Tomat cherry manis dan segar, sangat cocok untuk campuran salad atau camilan sehat.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Baby Spinach", price: 9000, desc: "Bayam muda yang lembut untuk salad atau sup bening kaya zat besi.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Carrot Fresh", price: 8000, desc: "Wortel manis renyah kualitas terbaik kaya akan vitamin A.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Broccoli", price: 18000, desc: "Brokoli hijau segar kaya serat dan antioksidan penangkal radikal bebas.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Cucumber", price: 6000, desc: "Timun segar berair, sangat cocok untuk lalapan atau infused water.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Lettuce", price: 7000, desc: "Selada hidroponik yang sangat renyah dan segar untuk burger atau salad.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Bell Pepper", price: 20000, desc: "Paprika warna-warni kaya vitamin C, renyah dan beraroma khas.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Eggplant", price: 10000, desc: "Terong ungu segar berkualitas untuk berbagai masakan rumah.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Cauliflower", price: 16000, desc: "Bunga kol putih bersih, padat, dan bebas pestisida.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Potato", price: 12000, desc: "Kentang pilihan berkualitas tinggi, empuk saat dimasak.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Pumpkin", price: 15000, desc: "Labu kuning manis dan pulen, cocok untuk kolak atau sup.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Green Beans", price: 8500, desc: "Buncis segar pilihan petani lokal, renyah dan manis.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Spring Onion", price: 5000, desc: "Daun bawang segar untuk pelengkap kuah dan masakan.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Garlic", price: 12000, desc: "Bawang putih kualitas tinggi, siung besar dan beraroma kuat.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Chili Pepper", price: 25000, desc: "Cabai rawit pedas segar pilihan terbaik hari ini.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Sweet Corn", price: 9000, desc: "Jagung manis segar, siap direbus atau dibakar.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Mushrooms", price: 14000, desc: "Jamur tiram segar dengan tekstur kenyal dan gurih.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Celery", price: 6000, desc: "Seledri organik dengan aroma khas yang kuat untuk kuah sup.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Radish", price: 7500, desc: "Lobak segar, renyah, dan menyehatkan.", image: "images/Coming soon.jpg", stock: 10}
+            ],
+            [
+                {name: "Minyak Goreng 1L", price: 17000, desc: "Minyak goreng berkualitas tinggi untuk hasil masakan yang renyah dan gurih.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Gula Pasir 1kg", price: 14000, desc: "Gula pasir putih manis alami, bersih dan higienis.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Tepung Terigu 1kg", price: 12000, desc: "Tepung terigu serbaguna untuk aneka kue dan gorengan.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Telur Ayam 1kg", price: 28000, desc: "Telur ayam segar pilihan kaya protein.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Beras Premium 5kg", price: 65000, desc: "Beras pulen berkualitas tinggi tanpa pemutih buatan.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Garam Dapur Halus", price: 3500, desc: "Garam beryodium tinggi untuk penyedap masakan harian.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Kecap Manis 500ml", price: 18000, desc: "Kecap manis kental dengan kedelai pilihan berkualitas.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Saus Sambal 340ml", price: 15000, desc: "Saus sambal pedas nikmat untuk teman makan gorengan.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Santan Instan 65ml", price: 4000, desc: "Santan kelapa murni instan siap pakai untuk masakan bersantan.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Merica Bubuk", price: 5000, desc: "Lada bubuk murni dengan aroma rempah yang kuat.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Ketumbar Bubuk", price: 5000, desc: "Ketumbar pilihan halus untuk bumbu marinasi.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Kaldu Ayam Instan", price: 6000, desc: "Penyedap rasa kuah kaldu ayam gurih alami.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Kaldu Sapi Instan", price: 6000, desc: "Penyedap rasa masakan daging sapi lezat.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Teh Celup Melati", price: 9000, desc: "Teh celup wangi melati segar untuk menemani pagi hari.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Kopi Hitam Sachet", price: 15000, desc: "Kopi bubuk instan beraroma mantap.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Susu Kental Manis", price: 12000, desc: "Susu kental manis lezat untuk minuman dan topping.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Mentega 200g", price: 10000, desc: "Margarin serbaguna untuk olesan roti dan menumis.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Sabun Cuci Piring", price: 7000, desc: "Cairan pembersih piring ampuh angkat lemak.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Deterjen Bubuk 800g", price: 18000, desc: "Deterjen wangi tahan lama bersih tuntas.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Penyegar Udara", price: 16000, desc: "Pengharum ruangan praktis dan menyegarkan.", image: "images/Coming soon.jpg", stock: 10}
+            ],
+            [
+                {name: "Tissue Wajah 200s", price: 11000, desc: "Tissue halus dan lembut aman untuk kulit wajah.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Sabun Mandi Batang", price: 4500, desc: "Sabun mandi antiseptik harum menyegarkan.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Shampo Sachet (Renceng)", price: 10000, desc: "Shampo rambut sehat berkilau praktis.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Pasta Gigi 120g", price: 13000, desc: "Pasta gigi perlindungan gigi kuat dan nafas segar.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Sikat Gigi Soft", price: 6000, desc: "Sikat gigi lembut tidak melukai gusi.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Pembersih Lantai", price: 12000, desc: "Cairan pembersih lantai kesat dan wangi anti kuman.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Spons Cuci Piring", price: 3000, desc: "Spons tebal pembersih kerak peralatan dapur.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Plastik Sampah Medium", price: 8000, desc: "Kantong plastik sampah kuat tidak mudah robek.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Korek Api Gas", price: 4000, desc: "Korek api praktis untuk kompor atau keperluan lain.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Lilin Putih (Pack)", price: 9000, desc: "Lilin darurat saat mati lampu tahan lama.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Baterai AA (Pair)", price: 10000, desc: "Baterai daya tahan lama untuk jam dinding atau remote.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Karet Gelang (Bungkus)", price: 3000, desc: "Karet elastis kuat untuk mengikat bungkus makanan.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Tusuk Sate (Pack)", price: 5000, desc: "Tusuk sate bambu bersih siap pakai.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Aluminium Foil", price: 22000, desc: "Foil aluminium tahan panas untuk oven atau pembungkus.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Plastik Klip Zip (Pack)", price: 7000, desc: "Kantong plastik kedap udara untuk simpan bumbu.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Masker Medis (Box)", price: 20000, desc: "Masker pelindung debu dan kuman isi 50 pcs.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Hand Sanitizer 100ml", price: 15000, desc: "Pembersih tangan antiseptik praktis tanpa bilas.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Kain Lap Serbaguna", price: 6000, desc: "Kain lap meja dapur menyerap air dengan baik.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Sapu Ijuk Lantai", price: 25000, desc: "Sapu ijuk lembut kuat untuk membersihkan debu lantai.", image: "images/Coming soon.jpg", stock: 10},
+                {name: "Pengki Sampah (Serokan)", price: 18000, desc: "Serokan sampah plastik kokoh dan tahan banting.", image: "images/Coming soon.jpg", stock: 10}
+            ]
+        ];
 
-        function displayProducts(filter = "") {
+        let cart = [];
+        let currentPage = 0;
+        let editTarget = { pageIndex: null, productIndex: null };
+
+        function saveUserState(actionName) {
+            const historyKey = "user_activity_log";
+            let logs = JSON.parse(localStorage.getItem(historyKey) || "[]");
+            logs.push({ action: actionName, time: new Date().toISOString() });
+            localStorage.setItem(historyKey, JSON.stringify(logs));
+        }
+
+        function initApp() {
+            saveUserState("Membuka halaman web");
+            renderStructure();
+            updateCartCount();
+            renderGrid(0);
+        }
+
+        function renderStructure() {
+            const tabsContainer = document.getElementById('pageTabsContainer');
+            tabsContainer.innerHTML = "";
+            categories.forEach((catName, idx) => {
+                tabsContainer.innerHTML += `<button class="tab-btn ${idx === currentPage ? 'active' : ''}" onclick="switchPage(${idx})">${catName}</button>`;
+            });
+
+            if (isAdminMode) {
+                tabsContainer.innerHTML += `<button class="tab-btn" style="background:#28a745; color:white;" onclick="addNewCategory()">➕ Tambah Kategori</button>`;
+            }
+
+            const pagesContainer = document.getElementById('catalogPagesContainer');
+            pagesContainer.innerHTML = "";
+            catalogsData.forEach((cat, idx) => {
+                pagesContainer.innerHTML += `
+                    <div id="page-${idx}" class="catalog-page ${idx === currentPage ? 'active-page' : ''}" style="${idx === currentPage ? 'display:block;' : 'display:none;'}">
+                        <div class="product-grid" id="grid-${idx}"></div>
+                    </div>
+                `;
+            });
+
+            const adminSelect = document.getElementById('adminCatalog');
+            if (adminSelect) {
+                adminSelect.innerHTML = "";
+                categories.forEach((catName, idx) => {
+                    adminSelect.innerHTML += `<option value="${idx}">${catName}</option>`;
+                });
+            }
+        }
+
+        function addNewCategory() {
+            saveUserState("Admin menambah kategori baru");
+            let newCatName = prompt("Masukkan nama kategori baru:");
+            if (newCatName && newCatName.trim() !== "") {
+                categories.push(newCatName.trim());
+                catalogsData.push([]);
+                renderStructure();
+                switchPage(categories.length - 1);
+                alert("Kategori berhasil ditambahkan!");
+            }
+        }
+
+        function toggleSidebar() {
+            saveUserState("Membuka/Menutup Sidebar");
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                sidebar.classList.add('open');
+                overlay.style.display = 'block';
+            }
+        }
+
+        function toggleStoreDesc() {
+            saveUserState("Melihat Deskripsi Toko");
+            const banner = document.getElementById('storeDescBanner');
+            const btn = document.getElementById('storeDescToggleBtn');
+            if (banner.style.display === 'block') {
+                banner.style.display = 'none';
+                btn.innerText = "ℹ️ Deskripsi Toko";
+            } else {
+                banner.style.display = 'block';
+                btn.innerText = "ℹ️ Sembunyikan Deskripsi";
+            }
+        }
+
+        function renderGrid(pageIndex, filter = "") {
+            const grid = document.getElementById(`grid-${pageIndex}`);
+            if (!grid) return;
+            let data = catalogsData[pageIndex] || [];
+
             grid.innerHTML = "";
-            products.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())).forEach((p) => {
+            const filtered = data.map((p, originalIndex) => ({ ...p, originalIndex })).filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p style="grid-column: span 2; text-align: center; color: #777;">Produk tidak ditemukan...</p>`;
+                return;
+            }
+
+            filtered.forEach((p) => {
+                let stockInfo = `<p style="font-size: 0.75rem; color: #666; margin: 0 0 5px 0;">Stok: ${p.stock !== undefined ? p.stock : 10}</p>`;
+                
+                let adminControls = '';
+                if (isAdminMode) {
+                    adminControls = `
+                        <div style="display:flex; justify-content:center; gap:8px; margin: 0 0 8px 0; flex-wrap:wrap;">
+                            <button class="edit-price-icon" onclick="openEditCatalog(${pageIndex}, ${p.originalIndex})" title="Edit Katalog">✏️ Edit Katalog</button>
+                            <button class="delete-catalog-icon" onclick="deleteProduct(${pageIndex}, ${p.originalIndex})" title="Hapus Katalog">🗑️ Hapus</button>
+                        </div>
+                    `;
+                }
+
                 grid.innerHTML += `
                 <div class="product-card">
-                    <div class="img-placeholder" onclick="openDesc('${p.name}', '${p.desc}')"></div>
-                    <h3 style="font-size: 0.8rem; margin: 5px 0;">${p.name}</h3>
-                    <p style="font-size: 0.8rem; margin: 0; font-weight: 700;">Rp ${p.price.toLocaleString()}</p>
-                    <button onclick="addToCart('${p.name}', ${p.price})">Tambah</button>
-                    <button class="btn-beli" onclick="buyNow('${p.name}', ${p.price})">Beli</button>
+                    <div>
+                        <img src="${p.image}" alt="${p.name}" onclick="openDesc('${p.name}', '${p.desc}', '${p.image}')" onerror="this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400'">
+                        <h3 style="font-size: 0.85rem; margin: 5px 0;">${p.name}</h3>
+                        ${stockInfo}
+                        <div class="price-container">
+                            <span style="font-size: 0.85rem; font-weight: 700;">Rp ${p.price.toLocaleString()}</span>
+                        </div>
+                        ${adminControls}
+                    </div>
+                    <div>
+                        <button onclick="addToCart('${p.name}', ${p.price}, ${pageIndex})">Tambah</button>
+                        <button class="btn-beli" onclick="buyNow('${p.name}', ${p.price})">Beli</button>
+                    </div>
                 </div>`;
             });
         }
 
-        function openDesc(name, desc) {
+        function switchPage(pageIndex) {
+            currentPage = pageIndex;
+            saveUserState(`Berpindah ke halaman kategori: ${categories[pageIndex]}`);
+            
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach((t, idx) => {
+                if(idx === pageIndex) {
+                    t.classList.add('active');
+                } else {
+                    t.classList.remove('active');
+                }
+            });
+
+            const pages = document.querySelectorAll('.catalog-page');
+            pages.forEach((p, idx) => {
+                if(idx === pageIndex) {
+                    p.style.display = 'block';
+                    setTimeout(() => p.classList.add('active-page'), 10);
+                } else {
+                    p.classList.remove('active-page');
+                    setTimeout(() => {
+                        if(!p.classList.contains('active-page')) {
+                            p.style.display = 'none';
+                        }
+                    }, 500);
+                }
+            });
+
+            renderGrid(currentPage, document.getElementById('searchBar').value);
+        }
+
+        function openDesc(name, desc, image) {
+            saveUserState(`Melihat detail produk: ${name}`);
             document.getElementById('desc-title').innerText = name;
             document.getElementById('desc-text').innerText = desc;
+            document.getElementById('desc-img').src = image;
             document.getElementById('desc-modal').style.display = 'flex';
         }
 
         function filterProducts() {
-            displayProducts(document.getElementById('searchBar').value);
+            const query = document.getElementById('searchBar').value;
+            renderGrid(currentPage, query);
         }
 
-        function addToCart(name, price) {
+        function addToCart(name, price, pageIndex) {
+            saveUserState(`Menambahkan ke keranjang: ${name}`);
             cart.push({name, price});
+            updateCartCount();
+            showCartToast(name);
+        }
+
+        function updateCartCount() {
             document.getElementById('count').innerText = cart.length;
         }
 
+        function showCartToast(itemName) {
+            const toast = document.getElementById('cartToast');
+            toast.innerText = `+ 1 ${itemName} ditambahkan ke keranjang`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
         function buyNow(name, price) {
-            window.location.href = `https://wa.me/${WA_NUMBER}?text=Halo Bu Niwen, saya mau beli: ${name} (Rp ${price.toLocaleString()})`;
+            saveUserState(`Klik Beli Sekarang: ${name}`);
+            window.location.href = `https://wa.me/${WA_NUMBER}?text=Halo, saya mau beli: ${name} (Rp ${price.toLocaleString()})`;
         }
 
         function openCart() {
+            saveUserState("Membuka keranjang belanja");
             const list = document.getElementById('cart-list');
-            list.innerHTML = cart.map(i => `<li>${i.name} - Rp ${i.price.toLocaleString()}</li>`).join('');
+            if (cart.length === 0) {
+                list.innerHTML = "<li style='text-align:center; color:#777;'>Keranjang masih kosong</li>";
+            } else {
+                list.innerHTML = cart.map(i => `<li style="padding: 4px 0; border-bottom: 1px solid #eee;">${i.name} - Rp ${i.price.toLocaleString()}</li>`).join('');
+            }
             document.getElementById('total').innerText = cart.reduce((sum, i) => sum + i.price, 0).toLocaleString();
             document.getElementById('modal').style.display = 'flex';
         }
@@ -138,12 +572,249 @@
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function checkout() {
+            saveUserState("Melakukan checkout pesanan ke WhatsApp");
+            if (cart.length === 0) return alert('Keranjang masih kosong!');
             let names = cart.map(i => i.name).join(", ");
             let total = cart.reduce((sum, i) => sum + i.price, 0);
-            window.location.href = `https://wa.me/${WA_NUMBER}?text=Halo Bu Niwen, saya mau pesan: ${names}. Total: Rp ${total.toLocaleString()}`;
+            window.location.href = `https://wa.me/${WA_NUMBER}?text=Halo, saya mau pesan: ${names}. Total: Rp ${total.toLocaleString()}`;
         }
 
-        displayProducts();
+        function openAdminLogin() {
+            saveUserState("Membuka modal login admin");
+            if (isAdminMode) {
+                if(confirm("Keluar dari Mode Admin?")) {
+                    exitAdminMode();
+                }
+                return;
+            }
+            document.getElementById('adminUsername').value = "";
+            document.getElementById('adminPassword').value = "";
+            document.getElementById('admin-modal').style.display = 'flex';
+        }
+
+        function verifyAdmin() {
+            const username = document.getElementById('adminUsername').value.trim();
+            const pass = document.getElementById('adminPassword').value;
+
+            if (username === "amardikri" && (pass === "adminwarung" || pass === "amar1605")) {
+                saveUserState("Login admin berhasil");
+                loginAttempts = 0;
+                alert("Login Admin Berhasil!");
+                closeModal('admin-modal');
+                enterAdminMode();
+            } else {
+                loginAttempts++;
+                saveUserState(`Percobaan login admin gagal ke-${loginAttempts}`);
+                if (loginAttempts >= 3) {
+                    let recoveryPass = prompt("Batas maksimal 3x kesalahan input terlampaui!\nMasukkan password pemulihan admin ('amar1605') untuk mereset dan masuk ulang:");
+                    if (recoveryPass === "amar1605") {
+                        saveUserState("Pemulihan admin berhasil via password darurat");
+                        loginAttempts = 0;
+                        alert("Reset berhasil! Masuk ke Mode Admin.");
+                        closeModal('admin-modal');
+                        enterAdminMode();
+                    } else {
+                        alert("Password pemulihan salah. Akses ditolak.");
+                        loginAttempts = 0;
+                        closeModal('admin-modal');
+                    }
+                } else {
+                    alert(`Username atau Sandi Admin Salah! Percobaan ke-${loginAttempts} dari 3.`);
+                }
+            }
+        }
+
+        function enterAdminMode() {
+            isAdminMode = true;
+            document.getElementById('headerMainTitle').innerText = "Dashboard Admin";
+            document.getElementById('sidebarTitle').innerText = "Menu Admin";
+            document.getElementById('editDescBtn').style.display = 'inline-block';
+            document.getElementById('adminLogoBtn').style.display = 'block';
+            
+            const sidebarMenuContent = document.getElementById('sidebarMenuContent');
+            sidebarMenuContent.innerHTML = `
+                <button class="sidebar-menu-btn" onclick="openCart(); toggleSidebar();">🛒 Keranjang (<span id="count">${cart.length}</span>)</button>
+                <button class="sidebar-menu-btn admin" onclick="openAdminFormModal(); toggleSidebar();">➕ Tambah Barang</button>
+                <button class="sidebar-menu-btn" onclick="exitAdminMode(); toggleSidebar();" style="background:#6c757d;">🚪 Keluar Mode Admin</button>
+            `;
+            
+            renderStructure();
+            renderGrid(currentPage, document.getElementById('searchBar').value);
+        }
+
+        function exitAdminMode() {
+            isAdminMode = false;
+            saveUserState("Keluar dari Mode Admin");
+            document.getElementById('headerMainTitle').innerText = "";
+            document.getElementById('sidebarTitle').innerText = "Menu Utama";
+            document.getElementById('editDescBtn').style.display = 'none';
+            document.getElementById('adminLogoBtn').style.display = 'none';
+            
+            const sidebarMenuContent = document.getElementById('sidebarMenuContent');
+            sidebarMenuContent.innerHTML = `
+                <button class="sidebar-menu-btn" onclick="openCart(); toggleSidebar();">🛒 Keranjang (<span id="count">${cart.length}</span>)</button>
+                <button class="sidebar-menu-btn admin" onclick="openAdminLogin(); toggleSidebar();">🔑 Admin (Mode Admin)</button>
+            `;
+            
+            renderStructure();
+            renderGrid(currentPage, document.getElementById('searchBar').value);
+            alert("Kembali ke Tampilan Pengguna.");
+        }
+
+        function openAdminFormModal() {
+            saveUserState("Membuka form tambah barang baru");
+            document.getElementById('admin-form-modal').style.display = 'flex';
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('adminImage').value = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addProduct() {
+            const cat = parseInt(document.getElementById('adminCatalog').value);
+            const image = document.getElementById('adminImage').value || "images/Coming soon.jpg";
+            const name = document.getElementById('adminName').value;
+            const price = parseFloat(document.getElementById('adminPrice').value);
+            const desc = document.getElementById('adminDesc').value;
+            const stock = parseInt(document.getElementById('adminStock').value) || 10;
+
+            if (!name || isNaN(price) || !desc) {
+                alert("Mohon isi semua data dengan benar!");
+                return;
+            }
+
+            const newProduct = { name, price, desc, image, stock };
+            if (!catalogsData[cat]) catalogsData[cat] = [];
+            catalogsData[cat].push(newProduct);
+
+            saveUserState(`Admin menambahkan produk baru: ${name}`);
+            alert("Barang berhasil ditambahkan ke katalog!");
+            closeModal('admin-form-modal');
+            renderGrid(currentPage, document.getElementById('searchBar').value);
+        }
+
+        // Delete Catalog Product function
+        function deleteProduct(pageIndex, productIndex) {
+            if (confirm("Apakah Anda yakin ingin menghapus produk ini dari katalog?")) {
+                let deletedItem = catalogsData[pageIndex][productIndex];
+                catalogsData[pageIndex].splice(productIndex, 1);
+                saveUserState(`Admin menghapus produk: ${deletedItem.name}`);
+                alert("Produk berhasil dihapus!");
+                renderGrid(currentPage, document.getElementById('searchBar').value);
+            }
+        }
+
+        // Edit Catalog logic (Tanpa Sandi Admin)
+        function openEditCatalog(pageIndex, productIndex) {
+            editTarget = { pageIndex, productIndex };
+            saveUserState("Membuka form edit katalog produk");
+            let prod = catalogsData[editTarget.pageIndex][editTarget.productIndex];
+            document.getElementById('editProductName').value = prod.name;
+            document.getElementById('editProductPrice').value = prod.price;
+            document.getElementById('editProductDesc').value = prod.desc;
+            document.getElementById('editProductStock').value = prod.stock !== undefined ? prod.stock : 10;
+            document.getElementById('editProductImage').value = prod.image;
+            document.getElementById('edit-price-modal').style.display = 'flex';
+        }
+
+        function handleEditImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('editProductImage').value = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveEditedCatalog() {
+            const newName = document.getElementById('editProductName').value;
+            const newPrice = parseFloat(document.getElementById('editProductPrice').value);
+            const newDesc = document.getElementById('editProductDesc').value;
+            const newStock = parseInt(document.getElementById('editProductStock').value);
+            const newImage = document.getElementById('editProductImage').value;
+
+            if (!newName || isNaN(newPrice) || newPrice < 0 || !newDesc || isNaN(newStock)) {
+                alert("Mohon masukkan data yang valid!");
+                return;
+            }
+
+            let prod = catalogsData[editTarget.pageIndex][editTarget.productIndex];
+            prod.name = newName;
+            prod.price = newPrice;
+            prod.desc = newDesc;
+            prod.stock = newStock;
+            if (newImage) prod.image = newImage;
+
+            saveUserState(`Admin mengedit katalog produk: ${newName}`);
+            alert("Katalog produk berhasil diperbarui!");
+            closeModal('edit-price-modal');
+            renderGrid(currentPage, document.getElementById('searchBar').value);
+        }
+
+        // Edit Store Description & Hours functions
+        function openEditDescModal() {
+            if (!isAdminMode) return;
+            saveUserState("Membuka modal edit deskripsi toko");
+            document.getElementById('inputStoreDesc').value = document.getElementById('storeDescContent').innerText;
+            document.getElementById('inputStoreHours').value = document.getElementById('storeHoursContent').innerHTML.replace(/<br\s*[\/]?>/gi, '\n');
+            document.getElementById('edit-desc-modal').style.display = 'flex';
+        }
+
+        function saveStoreDesc() {
+            const newDesc = document.getElementById('inputStoreDesc').value;
+            const newHours = document.getElementById('inputStoreHours').value.replace(/\n/g, '<br>');
+            if(!newDesc) {
+                alert("Deskripsi tidak boleh kosong!");
+                return;
+            }
+            document.getElementById('storeDescContent').innerHTML = newDesc;
+            document.getElementById('storeHoursContent').innerHTML = newHours;
+            saveUserState("Admin memperbarui deskripsi toko dan jam operasional");
+            alert("Deskripsi toko dan jam operasional berhasil diperbarui!");
+            closeModal('edit-desc-modal');
+        }
+
+        // Edit Logo functions
+        function openEditLogoModal() {
+            if (!isAdminMode) return;
+            saveUserState("Membuka modal ganti logo");
+            document.getElementById('inputLogoUrl').value = "";
+            document.getElementById('edit-logo-modal').style.display = 'flex';
+        }
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('inputLogoUrl').value = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveLogo() {
+            const newLogoUrl = document.getElementById('inputLogoUrl').value;
+            if(!newLogoUrl) {
+                alert("Pilih atau masukkan URL logo terlebih dahulu!");
+                return;
+            }
+            document.getElementById('heroLogoImg').src = newLogoUrl;
+            saveUserState("Admin mengganti logo warung");
+            alert("Logo warung berhasil diganti!");
+            closeModal('edit-logo-modal');
+        }
+
+        initApp();
     </script>
 </body>
-</html>
+    </html>
