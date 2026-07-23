@@ -281,7 +281,20 @@
         </div>
     </div>
 
+    <!-- Supabase Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Inisialisasi Supabase
+        const SUPABASE_URL = "https://wexftcdtuaeyqwreythf.supabase.co/rest/v1/";
+        // Membersihkan trailing /rest/v1/ untuk inisialisasi client SDK yang benar
+        const supabaseUrl = "https://wexftcdtuaeyqwreythf.supabase.co";
+        const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndleGZ0Y2R0dWFleXF3cmV5dGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDQ1NDEsImV4cCI6MjEwMDMyMDU0MX0.tRtoI0qG7vG-TaCfl1OcJC8zeFcPUljGOwXVYLXA0tU";
+        
+        let supabaseClient = null;
+        if (window.supabase) {
+            supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+        }
+
         const WA_NUMBER = "6285695020949"; 
         let isAdminMode = false;
         let loginAttempts = 0;
