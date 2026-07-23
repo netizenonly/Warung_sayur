@@ -285,8 +285,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Inisialisasi Supabase
-        const SUPABASE_URL = "https://wexftcdtuaeyqwreythf.supabase.co/rest/v1/";
-        // Membersihkan trailing /rest/v1/ untuk inisialisasi client SDK yang benar
         const supabaseUrl = "https://wexftcdtuaeyqwreythf.supabase.co";
         const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndleGZ0Y2R0dWFleXF3cmV5dGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDQ1NDEsImV4cCI6MjEwMDMyMDU0MX0.tRtoI0qG7vG-TaCfl1OcJC8zeFcPUljGOwXVYLXA0tU";
         
@@ -299,80 +297,12 @@
         let isAdminMode = false;
         let loginAttempts = 0;
         
-        let categories = ["Sayuran", "Kebutuhan", "Lainnya"];
-        
-        let catalogsData = [
-            [
-                {name: "Paket Sop Bening", price: 5000, desc: "Kol (Kubis) segar , Wortel , Buncis , Daun bawang , Bawang putih , Bawang merah", image: "images/paket sop bening.jpg", stock: 10},
-                {name: "Cherry Tomato", price: 15000, desc: "Tomat cherry manis dan segar, sangat cocok untuk campuran salad atau camilan sehat.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Baby Spinach", price: 9000, desc: "Bayam muda yang lembut untuk salad atau sup bening kaya zat besi.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Carrot Fresh", price: 8000, desc: "Wortel manis renyah kualitas terbaik kaya akan vitamin A.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Broccoli", price: 18000, desc: "Brokoli hijau segar kaya serat dan antioksidan penangkal radikal bebas.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Cucumber", price: 6000, desc: "Timun segar berair, sangat cocok untuk lalapan atau infused water.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Lettuce", price: 7000, desc: "Selada hidroponik yang sangat renyah dan segar untuk burger atau salad.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Bell Pepper", price: 20000, desc: "Paprika warna-warni kaya vitamin C, renyah dan beraroma khas.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Eggplant", price: 10000, desc: "Terong ungu segar berkualitas untuk berbagai masakan rumah.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Cauliflower", price: 16000, desc: "Bunga kol putih bersih, padat, dan bebas pestisida.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Potato", price: 12000, desc: "Kentang pilihan berkualitas tinggi, empuk saat dimasak.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Pumpkin", price: 15000, desc: "Labu kuning manis dan pulen, cocok untuk kolak atau sup.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Green Beans", price: 8500, desc: "Buncis segar pilihan petani lokal, renyah dan manis.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Spring Onion", price: 5000, desc: "Daun bawang segar untuk pelengkap kuah dan masakan.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Garlic", price: 12000, desc: "Bawang putih kualitas tinggi, siung besar dan beraroma kuat.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Chili Pepper", price: 25000, desc: "Cabai rawit pedas segar pilihan terbaik hari ini.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Sweet Corn", price: 9000, desc: "Jagung manis segar, siap direbus atau dibakar.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Mushrooms", price: 14000, desc: "Jamur tiram segar dengan tekstur kenyal dan gurih.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Celery", price: 6000, desc: "Seledri organik dengan aroma khas yang kuat untuk kuah sup.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Radish", price: 7500, desc: "Lobak segar, renyah, dan menyehatkan.", image: "images/Coming soon.jpg", stock: 10}
-            ],
-            [
-                {name: "Minyak Goreng 1L", price: 17000, desc: "Minyak goreng berkualitas tinggi untuk hasil masakan yang renyah dan gurih.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Gula Pasir 1kg", price: 14000, desc: "Gula pasir putih manis alami, bersih dan higienis.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Tepung Terigu 1kg", price: 12000, desc: "Tepung terigu serbaguna untuk aneka kue dan gorengan.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Telur Ayam 1kg", price: 28000, desc: "Telur ayam segar pilihan kaya protein.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Beras Premium 5kg", price: 65000, desc: "Beras pulen berkualitas tinggi tanpa pemutih buatan.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Garam Dapur Halus", price: 3500, desc: "Garam beryodium tinggi untuk penyedap masakan harian.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Kecap Manis 500ml", price: 18000, desc: "Kecap manis kental dengan kedelai pilihan berkualitas.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Saus Sambal 340ml", price: 15000, desc: "Saus sambal pedas nikmat untuk teman makan gorengan.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Santan Instan 65ml", price: 4000, desc: "Santan kelapa murni instan siap pakai untuk masakan bersantan.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Merica Bubuk", price: 5000, desc: "Lada bubuk murni dengan aroma rempah yang kuat.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Ketumbar Bubuk", price: 5000, desc: "Ketumbar pilihan halus untuk bumbu marinasi.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Kaldu Ayam Instan", price: 6000, desc: "Penyedap rasa kuah kaldu ayam gurih alami.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Kaldu Sapi Instan", price: 6000, desc: "Penyedap rasa masakan daging sapi lezat.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Teh Celup Melati", price: 9000, desc: "Teh celup wangi melati segar untuk menemani pagi hari.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Kopi Hitam Sachet", price: 15000, desc: "Kopi bubuk instan beraroma mantap.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Susu Kental Manis", price: 12000, desc: "Susu kental manis lezat untuk minuman dan topping.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Mentega 200g", price: 10000, desc: "Margarin serbaguna untuk olesan roti dan menumis.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Sabun Cuci Piring", price: 7000, desc: "Cairan pembersih piring ampuh angkat lemak.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Deterjen Bubuk 800g", price: 18000, desc: "Deterjen wangi tahan lama bersih tuntas.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Penyegar Udara", price: 16000, desc: "Pengharum ruangan praktis dan menyegarkan.", image: "images/Coming soon.jpg", stock: 10}
-            ],
-            [
-                {name: "Tissue Wajah 200s", price: 11000, desc: "Tissue halus dan lembut aman untuk kulit wajah.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Sabun Mandi Batang", price: 4500, desc: "Sabun mandi antiseptik harum menyegarkan.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Shampo Sachet (Renceng)", price: 10000, desc: "Shampo rambut sehat berkilau praktis.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Pasta Gigi 120g", price: 13000, desc: "Pasta gigi perlindungan gigi kuat dan nafas segar.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Sikat Gigi Soft", price: 6000, desc: "Sikat gigi lembut tidak melukai gusi.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Pembersih Lantai", price: 12000, desc: "Cairan pembersih lantai kesat dan wangi anti kuman.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Spons Cuci Piring", price: 3000, desc: "Spons tebal pembersih kerak peralatan dapur.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Plastik Sampah Medium", price: 8000, desc: "Kantong plastik sampah kuat tidak mudah robek.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Korek Api Gas", price: 4000, desc: "Korek api praktis untuk kompor atau keperluan lain.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Lilin Putih (Pack)", price: 9000, desc: "Lilin darurat saat mati lampu tahan lama.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Baterai AA (Pair)", price: 10000, desc: "Baterai daya tahan lama untuk jam dinding atau remote.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Karet Gelang (Bungkus)", price: 3000, desc: "Karet elastis kuat untuk mengikat bungkus makanan.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Tusuk Sate (Pack)", price: 5000, desc: "Tusuk sate bambu bersih siap pakai.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Aluminium Foil", price: 22000, desc: "Foil aluminium tahan panas untuk oven atau pembungkus.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Plastik Klip Zip (Pack)", price: 7000, desc: "Kantong plastik kedap udara untuk simpan bumbu.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Masker Medis (Box)", price: 20000, desc: "Masker pelindung debu dan kuman isi 50 pcs.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Hand Sanitizer 100ml", price: 15000, desc: "Pembersih tangan antiseptik praktis tanpa bilas.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Kain Lap Serbaguna", price: 6000, desc: "Kain lap meja dapur menyerap air dengan baik.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Sapu Ijuk Lantai", price: 25000, desc: "Sapu ijuk lembut kuat untuk membersihkan debu lantai.", image: "images/Coming soon.jpg", stock: 10},
-                {name: "Pengki Sampah (Serokan)", price: 18000, desc: "Serokan sampah plastik kokoh dan tahan banting.", image: "images/Coming soon.jpg", stock: 10}
-            ]
-        ];
+        let categories = [];
+        let catalogsData = [];
 
         let cart = [];
         let currentPage = 0;
-        let editTarget = { pageIndex: null, productIndex: null };
+        let editTarget = { categoryIndex: null, productIndex: null, productId: null };
 
         function saveUserState(actionName) {
             const historyKey = "user_activity_log";
@@ -381,11 +311,52 @@
             localStorage.setItem(historyKey, JSON.stringify(logs));
         }
 
-        function initApp() {
+        async function initApp() {
             saveUserState("Membuka halaman web");
-            renderStructure();
+            await fetchFromSupabase();
             updateCartCount();
-            renderGrid(0);
+        }
+
+        async function fetchFromSupabase() {
+            if (!supabaseClient) {
+                console.error("Supabase client belum siap.");
+                return;
+            }
+
+            // Ambil kategori dari database
+            const { data: catData, error: catError } = await supabaseClient.from('categories').select('*').order('id', { ascending: true });
+            if (catError) {
+                console.error("Gagal memuat kategori:", catError.message);
+                return;
+            }
+
+            categories = catData.map(c => c.name);
+            const categoryIds = catData.map(c => c.id);
+
+            // Ambil produk dari database
+            const { data: prodData, error: prodError } = await supabaseClient.from('products').select('*').order('id', { ascending: true });
+            if (prodError) {
+                console.error("Gagal memuat produk:", prodError.message);
+                return;
+            }
+
+            // Petakan produk ke struktur catalogsData berdasarkan category_id
+            catalogsData = categoryIds.map(catId => {
+                return prodData
+                    .filter(p => p.category_id === catId)
+                    .map(p => ({
+                        id: p.id,
+                        category_id: p.category_id,
+                        name: p.name,
+                        price: Number(p.price),
+                        desc: p.description,
+                        image: p.image,
+                        stock: p.stock
+                    }));
+            });
+
+            renderStructure();
+            renderGrid(currentPage);
         }
 
         function renderStructure() {
@@ -418,15 +389,19 @@
             }
         }
 
-        function addNewCategory() {
+        async function addNewCategory() {
             saveUserState("Admin menambah kategori baru");
             let newCatName = prompt("Masukkan nama kategori baru:");
             if (newCatName && newCatName.trim() !== "") {
-                categories.push(newCatName.trim());
-                catalogsData.push([]);
-                renderStructure();
-                switchPage(categories.length - 1);
+                const trimmedName = newCatName.trim();
+                const { data, error } = await supabaseClient.from('categories').insert([{ name: trimmedName }]).select();
+                if (error) {
+                    alert("Gagal menambah kategori: " + error.message);
+                    return;
+                }
                 alert("Kategori berhasil ditambahkan!");
+                await fetchFromSupabase();
+                switchPage(categories.length - 1);
             }
         }
 
@@ -690,8 +665,8 @@
             }
         }
 
-        function addProduct() {
-            const cat = parseInt(document.getElementById('adminCatalog').value);
+        async function addProduct() {
+            const catIndex = parseInt(document.getElementById('adminCatalog').value);
             const image = document.getElementById('adminImage').value || "images/Coming soon.jpg";
             const name = document.getElementById('adminName').value;
             const price = parseFloat(document.getElementById('adminPrice').value);
@@ -703,32 +678,49 @@
                 return;
             }
 
-            const newProduct = { name, price, desc, image, stock };
-            if (!catalogsData[cat]) catalogsData[cat] = [];
-            catalogsData[cat].push(newProduct);
+            // category_id di database dimulai dari 1 (indeks + 1)
+            const category_id = catIndex + 1;
+
+            const { error } = await supabaseClient.from('products').insert([
+                { category_id, name, price, description: desc, image, stock }
+            ]);
+
+            if (error) {
+                alert("Gagal menyimpan ke database: " + error.message);
+                return;
+            }
 
             saveUserState(`Admin menambahkan produk baru: ${name}`);
             alert("Barang berhasil ditambahkan ke katalog!");
             closeModal('admin-form-modal');
-            renderGrid(currentPage, document.getElementById('searchBar').value);
+            await fetchFromSupabase();
+            switchPage(catIndex);
         }
 
         // Delete Catalog Product function
-        function deleteProduct(pageIndex, productIndex) {
+        async function deleteProduct(pageIndex, productIndex) {
             if (confirm("Apakah Anda yakin ingin menghapus produk ini dari katalog?")) {
-                let deletedItem = catalogsData[pageIndex][productIndex];
-                catalogsData[pageIndex].splice(productIndex, 1);
-                saveUserState(`Admin menghapus produk: ${deletedItem.name}`);
+                let prod = catalogsData[pageIndex][productIndex];
+                
+                const { error } = await supabaseClient.from('products').delete().eq('id', prod.id);
+                if (error) {
+                    alert("Gagal menghapus produk: " + error.message);
+                    return;
+                }
+
+                saveUserState(`Admin menghapus produk: ${prod.name}`);
                 alert("Produk berhasil dihapus!");
-                renderGrid(currentPage, document.getElementById('searchBar').value);
+                await fetchFromSupabase();
+                switchPage(pageIndex);
             }
         }
 
         // Edit Catalog logic (Tanpa Sandi Admin)
         function openEditCatalog(pageIndex, productIndex) {
-            editTarget = { pageIndex, productIndex };
+            let prod = catalogsData[pageIndex][productIndex];
+            editTarget = { categoryIndex: pageIndex, productIndex: productIndex, productId: prod.id };
             saveUserState("Membuka form edit katalog produk");
-            let prod = catalogsData[editTarget.pageIndex][editTarget.productIndex];
+            
             document.getElementById('editProductName').value = prod.name;
             document.getElementById('editProductPrice').value = prod.price;
             document.getElementById('editProductDesc').value = prod.desc;
@@ -748,7 +740,7 @@
             }
         }
 
-        function saveEditedCatalog() {
+        async function saveEditedCatalog() {
             const newName = document.getElementById('editProductName').value;
             const newPrice = parseFloat(document.getElementById('editProductPrice').value);
             const newDesc = document.getElementById('editProductDesc').value;
@@ -760,17 +752,26 @@
                 return;
             }
 
-            let prod = catalogsData[editTarget.pageIndex][editTarget.productIndex];
-            prod.name = newName;
-            prod.price = newPrice;
-            prod.desc = newDesc;
-            prod.stock = newStock;
-            if (newImage) prod.image = newImage;
+            let prod = catalogsData[editTarget.categoryIndex][editTarget.productIndex];
+            const updatedData = {
+                name: newName,
+                price: newPrice,
+                description: newDesc,
+                stock: newStock,
+                image: newImage || prod.image
+            };
+
+            const { error } = await supabaseClient.from('products').update(updatedData).eq('id', editTarget.productId);
+            if (error) {
+                alert("Gagal memperbarui database: " + error.message);
+                return;
+            }
 
             saveUserState(`Admin mengedit katalog produk: ${newName}`);
             alert("Katalog produk berhasil diperbarui!");
             closeModal('edit-price-modal');
-            renderGrid(currentPage, document.getElementById('searchBar').value);
+            await fetchFromSupabase();
+            switchPage(editTarget.categoryIndex);
         }
 
         // Edit Store Description & Hours functions
